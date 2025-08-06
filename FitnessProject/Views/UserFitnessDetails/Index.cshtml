@@ -1,0 +1,52 @@
+﻿@model IEnumerable<FitnessProject.Models.UserFitnessDetails>
+
+@{
+    ViewData["Title"] = "User Fitness Details";
+}
+
+<h1>User Fitness Details</h1>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>User Name</th>
+            <th>DOB</th>
+            <th>Gender</th>
+            <th>Height (cm)</th>
+            <th>Weight (kg)</th>
+            <th>Goal</th>
+            <th>Experience Level</th>
+            <th>Assigned Plans</th>
+            @* <th></th> *@
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.User?.Email</td>
+                <td>@user.DOB.ToString("yyyy-MM-dd")</td>
+                <td>@user.Gender</td>
+                <td>@user.Height</td>
+                <td>@user.Weight</td>
+                <td>@user.Goal</td>
+                <td>@user.ExperienceLevel</td>
+                <td>
+                    @if (user.AssignedPlans != null && user.AssignedPlans.Any())
+                    {
+                        @string.Join(", ", user.AssignedPlans.Select(p => p.Title))
+                    }
+                    else
+                    {
+                        <em>No Plans Assigned</em>
+                    }
+                </td>
+                @* <td>
+                    <a asp-action="Details" asp-route-id="@user.Id">Details</a> |
+                    <a asp-action="Edit" asp-route-id="@user.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@user.Id">Delete</a>
+                </td> *@
+            </tr>
+        }
+    </tbody>
+</table>

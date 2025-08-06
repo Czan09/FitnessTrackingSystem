@@ -1,0 +1,39 @@
+﻿@model IEnumerable<FitnessProject.Models.TrainerDetails>
+
+@{
+    ViewData["Title"] = "Trainer Details";
+}
+
+<h1>Trainer Details</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Trainer</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.First().Name)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Specialty)</th>
+            <th>@Html.DisplayNameFor(model => model.First().YearsOfExperience)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Contact)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var trainer in Model)
+        {
+            <tr>
+                <td>@trainer.Name</td>
+                <td>@trainer.Specialty</td>
+                <td>@trainer.YearsOfExperience</td>
+                <td>@trainer.Contact</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@trainer.Id" class="btn btn-info btn-sm">Details</a>
+                    <a asp-action="Edit" asp-route-id="@trainer.Id" class="btn btn-warning btn-sm">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@trainer.Id" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

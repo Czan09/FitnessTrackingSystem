@@ -1,0 +1,26 @@
+﻿@model FitnessProject.Models.TrainerDetails
+
+@{
+    ViewData["Title"] = "Trainer Details";
+}
+
+<h1>Trainer Details</h1>
+
+<div>
+    <h4>@Model.Name</h4>
+    <dl class="row">
+        <dt class="col-sm-2">Specialty</dt>
+        <dd class="col-sm-10">@Model.Specialty</dd>
+
+        <dt class="col-sm-2">Years of Experience</dt>
+        <dd class="col-sm-10">@Model.YearsOfExperience</dd>
+
+        <dt class="col-sm-2">Contact</dt>
+        <dd class="col-sm-10">@Model.Contact</dd>
+    </dl>
+</div>
+
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</p>

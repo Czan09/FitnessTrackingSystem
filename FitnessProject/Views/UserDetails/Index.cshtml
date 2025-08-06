@@ -1,0 +1,30 @@
+﻿@using System.Security.Claims
+@{
+    ViewData["Title"] = "User Dashboard";
+
+    var userName = User.Identity?.Name ?? "Guest";
+    var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value ?? "No Role Assigned";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Welcome, @userName</h2>
+        </div>
+        <div class="card-body">
+            <p><strong>Your Role:</strong> @userRole</p>
+
+            <div class="mt-4">
+                
+                <br />
+                <a href="@Url.Action("EditProfile", "UserDetails")" class="btn btn-warning mb-2">
+                    Edit Profile
+                </a>
+                <br />
+                <a href="@Url.Action("ChangePassword", "UserDetails")" class="btn btn-danger mb-2">
+                    Change Password
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

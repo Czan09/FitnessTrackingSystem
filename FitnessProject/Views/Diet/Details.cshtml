@@ -1,0 +1,31 @@
+﻿@model FitnessProject.Models.Diets
+
+@{
+    ViewData["Title"] = "Diet Details";
+}
+
+<h1>Diet Details</h1>
+
+<div>
+    <h4>Diet</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">Meal Name</dt>
+        <dd class="col-sm-9">@Model.MealName</dd>
+
+        <dt class="col-sm-3">Description</dt>
+        <dd class="col-sm-9">@Model.Description</dd>
+
+        <dt class="col-sm-3">Calories</dt>
+        <dd class="col-sm-9">@Model.Calories</dd>
+
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">@Model.Type</dd>
+
+    </dl>
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>

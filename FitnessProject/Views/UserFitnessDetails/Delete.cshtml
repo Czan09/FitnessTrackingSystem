@@ -1,0 +1,40 @@
+﻿@model FitnessProject.Models.UserFitnessDetails
+
+@{
+    ViewData["Title"] = "Delete User Fitness Details";
+}
+
+<h1>Delete User Fitness Details</h1>
+
+<h3>Are you sure you want to delete this user fitness details?</h3>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">User ID</dt>
+        <dd class="col-sm-10">@Model.UserId</dd>
+
+        <dt class="col-sm-2">Date of Birth</dt>
+        <dd class="col-sm-10">@Model.DOB.ToString("yyyy-MM-dd")</dd>
+
+        <dt class="col-sm-2">Gender</dt>
+        <dd class="col-sm-10">@Model.Gender.ToString()</dd>
+
+        <dt class="col-sm-2">Height</dt>
+        <dd class="col-sm-10">@Model.Height</dd>
+
+        <dt class="col-sm-2">Weight</dt>
+        <dd class="col-sm-10">@Model.Weight</dd>
+
+        <dt class="col-sm-2">Goal</dt>
+        <dd class="col-sm-10">@Model.Goal</dd>
+
+        <dt class="col-sm-2">Experience Level</dt>
+        <dd class="col-sm-10">@Model.ExperienceLevel</dd>
+    </dl>
+
+    <form asp-action="DeleteConfirmed" method="post">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
