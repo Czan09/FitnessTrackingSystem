@@ -82,6 +82,7 @@ namespace FitnessProject.Controllers
                     ExperienceLevel = model.ExperienceLevel
                 };
 
+
                 var selectedPlans = await _context.WorkoutPlans
                     .Where(p => model.AssignedPlanIds.Contains(p.Id))
                     .ToListAsync();
@@ -146,11 +147,11 @@ namespace FitnessProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, UserFitnessDetailsViewModel model)
         {
+            Console.WriteLine("Edit Reached Here");
             if (id != model.Id) return NotFound();
 
             if (!ModelState.IsValid)
             {
-                // Reload dropdowns
                 model.AvailablePlans = await _context.WorkoutPlans
                     .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Title })
                     .ToListAsync();
@@ -175,8 +176,9 @@ namespace FitnessProject.Controllers
             user.Weight = model.Weight;
             user.Goal = model.Goal;
             user.ExperienceLevel = model.ExperienceLevel;
+            Console.WriteLine("UserDataEdit:::"+user);
 
-            // Update assigned plans
+            // Clear and update assigned plans
             user.AssignedPlans.Clear();
             if (model.AssignedPlanIds != null)
             {
@@ -195,16 +197,15 @@ namespace FitnessProject.Controllers
                 _context.Update(user);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "User fitness details updated successfully.";
+                return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserFitnessDetailsExists(user.Id))
+                if (!_context.UserFitnessDetails.Any(e => e.Id == user.Id))
                     return NotFound();
-                else
-                    throw;
-            }
 
-            return RedirectToAction(nameof(Index));
+                throw;
+            }
         }
 
         private bool UserFitnessDetailsExists(int id)

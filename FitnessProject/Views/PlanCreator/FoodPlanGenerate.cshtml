@@ -1,0 +1,44 @@
+﻿@model FitnessProject.Models.PlanResultViewModel
+
+<h2>Recommended Meals</h2>
+
+
+@if (Model.RecommendedMeals?.Any() == true)
+{
+    <form method="post" asp-action="SaveFoodPlan">
+        <input type="hidden" name="UserId" asp-for="@Model.UserId" readonly/>
+        <input type="text" name="PlanName" placeholder="Enter plan name" class="form-control mb-2" required />
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Meal Name</th>
+                    <th>Type</th>
+                    <th>Calories</th>
+                    <th>Description</th>
+                    <th>Select</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var meal in Model.RecommendedMeals)
+                {
+                    <tr>
+                        <td>@meal.MealName</td>
+                        <td>@meal.Type.ToString()</td>
+                        <td>@meal.Calories</td>
+                        <td>@Html.Raw(meal.Description)</td>
+                        <td>
+                            <input type="checkbox" name="selectedMealIds" value="@meal.Id" checked />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-success">Save Plan</button>
+    </form>
+}
+else
+{
+    <p>No recommended meals found.</p>
+}

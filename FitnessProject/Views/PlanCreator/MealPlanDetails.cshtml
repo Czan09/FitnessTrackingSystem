@@ -1,0 +1,36 @@
+﻿@model IEnumerable<FitnessProject.Models.MealPlanMeals>
+@{
+    ViewData["Title"] = "Meal Plan Details";
+    var planName = ViewBag.PlanName as string;
+}
+
+<h2>Meals in Plan: @planName</h2>
+
+@if (!Model.Any())
+{
+    <p>No meals found in this plan.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Meal Name</th>
+                <th>Calories</th>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Meal?.MealName</td>
+                    <td>@item.Meal?.Calories</td>
+                    <td>@item.Meal?.Type</td>
+                    <td>@Html.Raw(item.Meal?.Description)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

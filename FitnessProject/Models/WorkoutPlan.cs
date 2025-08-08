@@ -19,7 +19,6 @@ namespace FitnessProject.Models
         public TrainerDetails? Trainer { get; set; }
         public MemberGoals Goal { get; set; }
 
-        // Navigation
         public ICollection<Workout> Workouts { get; set; } = new List<Workout>();
     }
 }

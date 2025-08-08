@@ -50,17 +50,5 @@ using (var scope = app.Services.CreateScope())
     await RoleSeeder.SeedRolesAsync(services);
 }
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    var seeder = new DataSeeder(db);
-    await seeder.SeedMealPlansAsync();
-}
 
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    var workoutSeeder = new WorkoutPlanSeeder(dbContext);
-    await workoutSeeder.SeedWorkoutPlansAsync(); // you can change the number of plans
-}
 app.Run();

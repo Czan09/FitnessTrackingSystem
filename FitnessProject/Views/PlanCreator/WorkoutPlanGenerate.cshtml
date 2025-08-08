@@ -1,0 +1,39 @@
+﻿@model FitnessProject.Models.PlanResultViewModel
+
+<h2>Recommended Workouts</h2>
+
+@if (Model.RecommendedWorkouts?.Any() == true)
+{
+    <form method="post" asp-action="SaveWorkoutPlan">
+        <input type="hidden" name="UserId" asp-for="@Model.UserId" readonly />
+        <input type="text" name="PlanName" placeholder="Enter plan name" class="form-control mb-2" required />
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Workout Name</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Select</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var workout in Model.RecommendedWorkouts)
+                {
+                    <tr>
+                        <td>@workout.Name</td>
+                        <td>@workout.Type</td>
+                        <td>@Html.Raw(workout.Description)</td>
+                        <td><input type="checkbox" name="selectedWorkoutIds" value="@workout.Id" checked /></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-success">Save Workout Plan</button>
+    </form>
+}
+else
+{
+    <p>No recommended workouts found.</p>
+}

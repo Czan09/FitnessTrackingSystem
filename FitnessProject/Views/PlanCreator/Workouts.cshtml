@@ -1,0 +1,30 @@
+﻿@model IEnumerable<FitnessProject.Models.WorkoutPlanUser>
+
+<h2>Saved Workouts</h2>
+
+@if (!Model.Any())
+{
+    <p>No workouts saved.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Workout Name</th>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Workout?.Name</td>
+                    <td>@item.Workout?.Type</td>
+                    <td>@Html.Raw(item.Workout?.Description)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

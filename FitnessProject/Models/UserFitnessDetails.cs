@@ -16,6 +16,7 @@ namespace FitnessProject.Models
         public string UserId { get; set; } = string.Empty;
         [Required]
         [DataType(DataType.Date)]
+        [MinimumAge(16,ErrorMessage ="Minimum age is 16")]
         public DateOnly DOB { get; set; }
         [Required]
         public Gender Gender { get; set; }

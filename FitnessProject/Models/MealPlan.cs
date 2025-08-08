@@ -1,22 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FitnessProject.Data;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FitnessProject.Models
 {
     public class MealPlan
     {
         [Key]
-        public int id { get; set; }
+        public int Id { get; set; }
         [Required]
-        public string PlanName { get; set; } = string.Empty;
-
-        public string Description { get; set; } = string.Empty;
-
-        public string Day { get; set; } = string.Empty;
-
-        public int TotalCalories { get; set; }
-
-        public ICollection<MealPlanDiet> Meals { get; set; } = new List<MealPlanDiet>();
-
+        public string Name { get; set; }
+        [Required]
+        public string userId { get; set; }
+        [ForeignKey("userId")]
+        public ApplicationUser User { get; set; }
     }
 }

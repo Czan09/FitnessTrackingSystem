@@ -4,8 +4,9 @@ using FitnessProject.Models.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace FitnessProject.Controllers
 {
@@ -14,22 +15,25 @@ namespace FitnessProject.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UserDetailsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public UserDetailsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         // GET: /UserDetails
         public async Task<IActionResult> Index()
         {
             var currentUserId = _userManager.GetUserId(User);
+            var currentUserRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value ?? "No Role Assigned";
             var userProfile = await _context.UserFitnessDetails
                 .Include(u => u.AssignedPlans)
                 .FirstOrDefaultAsync(u => u.UserId == currentUserId);
 
-            if (userProfile == null)
+            if (userProfile == null && currentUserRole == "Member")
                 return RedirectToAction(nameof(CreateProfile));
 
             return View(userProfile);
@@ -106,8 +110,10 @@ namespace FitnessProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditProfile(UserFitnessDetails model)
         {
-            if (!ModelState.IsValid)
-                return View(model);
+            Console.WriteLine($"{nameof(EditProfile)}");
+            //Console.WriteLine(ModelState);
+            //if (!ModelState.IsValid)
+            //    return View(model);
 
             var userId = _userManager.GetUserId(User);
             var user = await _context.UserFitnessDetails.FirstOrDefaultAsync(u => u.UserId == userId);
@@ -123,7 +129,7 @@ namespace FitnessProject.Controllers
             user.DietType = model.DietType;
             user.FitnessNotes = model.FitnessNotes;
             user.MedicalConditions = model.MedicalConditions;
-
+            Console.WriteLine(user);
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));

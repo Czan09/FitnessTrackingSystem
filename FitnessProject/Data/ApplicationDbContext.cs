@@ -16,9 +16,9 @@ namespace FitnessProject.Data
         public DbSet<WorkoutPlan> WorkoutPlans { get; set; }//
         public DbSet<Workout> Workouts { get; set; } //
         public DbSet<Diets> Diets { get; set; } //
-        public DbSet<MealPlan> MealPlans { get; set; } //
-        public DbSet<MealPlanDiet> MealPlanDiets { get; set; } //
-
+        public DbSet<WorkoutPlanUser> WorkoutPlanUsers {get;set;}
+        public DbSet<MealPlan> MealPlans { get; set; }
+        public DbSet<MealPlanMeals> MealPlanMeals { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,6 +29,7 @@ namespace FitnessProject.Data
                 .WithMany()
                 .HasForeignKey(u => u.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+           
 
         }
 
