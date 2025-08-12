@@ -47,17 +47,12 @@
                             if (User.IsInRole("Admin") || User.IsInRole("Trainer"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
-                                </li>
-                                <li class="nav-item">
                                     <a class="nav-link text-dark" asp-controller="Diet" asp-action="Index">Food DB</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-controller="UserFitnessDetails" asp-action="Index">User Fitness</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="WorkoutPlan" asp-action="Index">Workout Plans</a>
-                                </li>
+                              
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-controller="Workouts" asp-action="Index">Workouts</a>
                                 </li>
