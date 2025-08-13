@@ -13,7 +13,6 @@ namespace FitnessProject.Data
 
         public DbSet<UserFitnessDetails> UserFitnessDetails { get; set; } //
         public DbSet<TrainerDetails> TrainerDetails { get; set; } //
-        public DbSet<WorkoutPlan> WorkoutPlans { get; set; }//
         public DbSet<Workout> Workouts { get; set; } //
         public DbSet<Diets> Diets { get; set; } //
         public DbSet<WorkoutPlanUser> WorkoutPlanUsers {get;set;}

@@ -16,28 +16,41 @@
             <p><strong>Your Role:</strong> @userRole</p>
 
             <div class="mt-4">
-                <a href="@Url.Action("EditProfile", "UserDetails")" class="btn btn-warning mb-2">
-                    Edit Profile
-                </a>
-                <br />
+                
                 <a href="@Url.Action("ChangePassword", "UserDetails")" class="btn btn-danger mb-2">
                     Change Password
                 </a>
-                <br />
-                <a href="@Url.Action("WorkoutPlanGenerate", "PlanCreator", new { userId = userId })" class="btn btn-success mb-2">
-                    Generate Workout Plan
-                </a>
-                <br />
-                <a href="@Url.Action("FoodPlanGenerate", "PlanCreator", new { userId = userId })" class="btn btn-success mb-2">
-                    Generate Food Plan
-                </a> <br/>
-                <a class="btn btn-success mb-2"
-                   asp-controller="PlanCreator"
-                asp-action="MealPlans" asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">My Meal Plans</a>
-                <br />
-                <a class="btn btn-success mb-2" asp-controller="PlanCreator" 
-                asp-action="Workouts" asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">My Saved Workouts</a>
+                <br/>
 
+                @if (userRole == "Member")
+                {
+                    <a href="@Url.Action("EditProfile", "UserDetails")" class="btn btn-warning mb-2">
+                        Edit Profile
+                    </a>
+                    
+                    <br />
+                    <a href="@Url.Action("WorkoutPlanGenerate", "PlanCreator", new { userId = userId })" class="btn btn-success mb-2">
+                        Generate Workout Plan
+                    </a>
+                    <br />
+                    <a href="@Url.Action("FoodPlanGenerate", "PlanCreator", new { userId = userId })" class="btn btn-success mb-2">
+                        Generate Food Plan
+                    </a>
+                    <br />
+                    <a class="btn btn-success mb-2"
+                       asp-controller="PlanCreator"
+                       asp-action="MealPlans"
+                       asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">
+                        My Meal Plans
+                    </a>
+                    <br />
+                    <a class="btn btn-success mb-2"
+                       asp-controller="PlanCreator"
+                       asp-action="Workouts"
+                       asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">
+                        My Saved Workouts
+                    </a>
+                }
             </div>
         </div>
     </div>

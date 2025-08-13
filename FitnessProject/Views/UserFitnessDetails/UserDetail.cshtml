@@ -31,22 +31,7 @@
         <dt class="col-sm-2">Experience Level</dt>
         <dd class="col-sm-10">@Model.ExperienceLevel</dd>
 
-        <dt class="col-sm-2">Assigned Plans</dt>
-        <dd class="col-sm-10">
-            @if (Model.AssignedPlans != null && Model.AssignedPlans.Any())
-            {
-                <ul>
-                    @foreach (var plan in Model.AssignedPlans)
-                    {
-                        <li>@plan.Title</li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <em>No Plans Assigned</em>
-            }
-        </dd>
+        
     </dl>
 </div>
 

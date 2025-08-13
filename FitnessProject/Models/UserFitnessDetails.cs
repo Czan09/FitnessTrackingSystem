@@ -39,7 +39,6 @@ namespace FitnessProject.Models
         [NotMapped]
         public float BMI => Weight / (Height / 100 * Height / 100);
 
-        public virtual ICollection<WorkoutPlan> AssignedPlans { get; set; } = new List<WorkoutPlan>();
 
         public virtual ApplicationUser? User { get; set; }
 

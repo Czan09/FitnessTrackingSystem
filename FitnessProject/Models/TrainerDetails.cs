@@ -16,7 +16,6 @@ namespace FitnessProject.Models
         [EmailAddress(ErrorMessage = "Please enter a valid email address")]
         public string Contact { get; set; } = string.Empty;
 
-        // Navigation
-        public ICollection<WorkoutPlan> WorkoutPlans { get; set; } = new List<WorkoutPlan>();
+      
     }
 }

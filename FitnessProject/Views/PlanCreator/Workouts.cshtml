@@ -1,30 +1,53 @@
-﻿@model IEnumerable<FitnessProject.Models.WorkoutPlanUser>
+﻿@using FitnessProject.ViewModels
+@model IEnumerable<WorkoutPlanViewModel>
 
-<h2>Saved Workouts</h2>
+<h2>Saved Workout Plans</h2>
 
 @if (!Model.Any())
 {
-    <p>No workouts saved.</p>
+    <p>No workout plans saved.</p>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Workout Name</th>
-                <th>Type</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.Workout?.Name</td>
-                    <td>@item.Workout?.Type</td>
-                    <td>@Html.Raw(item.Workout?.Description)</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="accordion" id="plansAccordion">
+        @foreach (var plan in Model)
+        {
+            var collapseId = plan.PlanName.Replace(" ", "") + "Collapse";
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="@plan.PlanName.Replace(" ", "")Header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                        @plan.PlanName
+                    </button>
+                    <form method="post" asp-action="DeletePlan" class="ms-3">
+                        <input type="hidden" name="planName" value="@plan.PlanName" />
+                        <input type="hidden" name="userId" value="@ViewBag.UserId" />
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </h2>
+                <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@plan.PlanName.Replace(" ", "")Header" data-bs-parent="#plansAccordion">
+                    <div class="accordion-body">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var workout in plan.Workouts)
+                                {
+                                    <tr>
+                                        <td>@workout?.Name</td>
+                                        <td>@workout?.Type</td>
+                                        <td>@Html.Raw(workout?.Description)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 }

@@ -26,7 +26,6 @@ namespace FitnessProject.Controllers
         {
             var users = await _context.UserFitnessDetails
                         .Include(u => u.User) 
-                        .Include(u => u.AssignedPlans)
                         .ToListAsync();
             return View(users);
         }
@@ -37,7 +36,6 @@ namespace FitnessProject.Controllers
             if (id == null) return NotFound();
 
             var user = await _context.UserFitnessDetails
-                .Include(u => u.AssignedPlans)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (user == null) return NotFound();
@@ -48,13 +46,10 @@ namespace FitnessProject.Controllers
         // GET: UserFitnessDetails/Create
         public async Task<IActionResult> Create()
         {
-            var plans = await _context.WorkoutPlans.ToListAsync();
-
+           
             var model = new UserFitnessDetailsViewModel
             {
-                AvailablePlans = plans
-                    .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Title })
-                    .ToList(),
+               
                 GoalOptions = Enum.GetValues(typeof(MemberGoals)).Cast<MemberGoals>()
                     .Select(e => new SelectListItem { Value = e.ToString(), Text = e.ToString() }),
                 ExperienceOptions = Enum.GetValues(typeof(ExperinceLevelMember)).Cast<ExperinceLevelMember>()
@@ -83,11 +78,11 @@ namespace FitnessProject.Controllers
                 };
 
 
-                var selectedPlans = await _context.WorkoutPlans
-                    .Where(p => model.AssignedPlanIds.Contains(p.Id))
-                    .ToListAsync();
+                //var selectedPlans = await _context.WorkoutPlans
+                //    .Where(p => model.AssignedPlanIds.Contains(p.Id))
+                //    .ToListAsync();
 
-                user.AssignedPlans = selectedPlans;
+                //user.AssignedPlans = selectedPlans;
 
                 _context.Add(user);
                 await _context.SaveChangesAsync();
@@ -95,9 +90,7 @@ namespace FitnessProject.Controllers
             }
 
             // Reload dropdowns
-            model.AvailablePlans = await _context.WorkoutPlans
-                .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Title })
-                .ToListAsync();
+            
             model.GoalOptions = Enum.GetValues(typeof(MemberGoals)).Cast<MemberGoals>()
                 .Select(e => new SelectListItem { Value = e.ToString(), Text = e.ToString() });
             model.ExperienceOptions = Enum.GetValues(typeof(ExperinceLevelMember)).Cast<ExperinceLevelMember>()
@@ -112,12 +105,10 @@ namespace FitnessProject.Controllers
             if (id == null) return NotFound();
 
             var user = await _context.UserFitnessDetails
-                .Include(u => u.AssignedPlans)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null) return NotFound();
 
-            var plans = await _context.WorkoutPlans.ToListAsync();
 
             var model = new UserFitnessDetailsViewModel
             {
@@ -129,10 +120,7 @@ namespace FitnessProject.Controllers
                 Weight = user.Weight,
                 Goal = user.Goal,
                 ExperienceLevel = user.ExperienceLevel,
-                AssignedPlanIds = user.AssignedPlans.Select(p => p.Id).ToList(),
-                AvailablePlans = plans
-                    .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Title })
-                    .ToList(),
+               
                 GoalOptions = Enum.GetValues(typeof(MemberGoals)).Cast<MemberGoals>()
                     .Select(e => new SelectListItem { Value = e.ToString(), Text = e.ToString() }),
                 ExperienceOptions = Enum.GetValues(typeof(ExperinceLevelMember)).Cast<ExperinceLevelMember>()
@@ -152,9 +140,7 @@ namespace FitnessProject.Controllers
 
             if (!ModelState.IsValid)
             {
-                model.AvailablePlans = await _context.WorkoutPlans
-                    .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Title })
-                    .ToListAsync();
+               
                 model.GoalOptions = Enum.GetValues(typeof(MemberGoals)).Cast<MemberGoals>()
                     .Select(e => new SelectListItem { Value = e.ToString(), Text = e.ToString() });
                 model.ExperienceOptions = Enum.GetValues(typeof(ExperinceLevelMember)).Cast<ExperinceLevelMember>()
@@ -164,7 +150,6 @@ namespace FitnessProject.Controllers
             }
 
             var user = await _context.UserFitnessDetails
-                .Include(u => u.AssignedPlans)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null) return NotFound();
@@ -179,18 +164,18 @@ namespace FitnessProject.Controllers
             Console.WriteLine("UserDataEdit:::"+user);
 
             // Clear and update assigned plans
-            user.AssignedPlans.Clear();
-            if (model.AssignedPlanIds != null)
-            {
-                var selectedPlans = await _context.WorkoutPlans
-                    .Where(p => model.AssignedPlanIds.Contains(p.Id))
-                    .ToListAsync();
+            //user.AssignedPlans.Clear();
+            //if (model.AssignedPlanIds != null)
+            //{
+            //    var selectedPlans = await _context.WorkoutPlans
+            //        .Where(p => model.AssignedPlanIds.Contains(p.Id))
+            //        .ToListAsync();
 
-                foreach (var plan in selectedPlans)
-                {
-                    user.AssignedPlans.Add(plan);
-                }
-            }
+            //    foreach (var plan in selectedPlans)
+            //    {
+            //        user.AssignedPlans.Add(plan);
+            //    }
+            //}
 
             try
             {

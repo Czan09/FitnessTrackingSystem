@@ -31,16 +31,7 @@
                 <td>@user.Weight</td>
                 <td>@user.Goal</td>
                 <td>@user.ExperienceLevel</td>
-                <td>
-                    @if (user.AssignedPlans != null && user.AssignedPlans.Any())
-                    {
-                        @string.Join(", ", user.AssignedPlans.Select(p => p.Title))
-                    }
-                    else
-                    {
-                        <em>No Plans Assigned</em>
-                    }
-                </td>
+                
                 @* <td>
                     <a asp-action="Details" asp-route-id="@user.Id">Details</a> |
                     <a asp-action="Edit" asp-route-id="@user.Id">Edit</a> |

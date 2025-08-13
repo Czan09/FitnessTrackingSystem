@@ -30,7 +30,6 @@ namespace FitnessProject.Controllers
             var currentUserId = _userManager.GetUserId(User);
             var currentUserRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value ?? "No Role Assigned";
             var userProfile = await _context.UserFitnessDetails
-                .Include(u => u.AssignedPlans)
                 .FirstOrDefaultAsync(u => u.UserId == currentUserId);
 
             if (userProfile == null && currentUserRole == "Member")
@@ -96,7 +95,6 @@ namespace FitnessProject.Controllers
         {
             var userId = _userManager.GetUserId(User);
             var user = await _context.UserFitnessDetails
-                .Include(u => u.AssignedPlans)
                 .FirstOrDefaultAsync(u => u.UserId == userId);
 
             if (user == null)

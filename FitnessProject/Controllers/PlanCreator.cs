@@ -2,6 +2,7 @@
 using FitnessProject.Models;
 using FitnessProject.Models.enums;
 using FitnessProject.RecommendationEngine;
+using FitnessProject.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
@@ -107,6 +108,7 @@ namespace FitnessProject.Controllers
             {
                 var entry = new WorkoutPlanUser
                 {
+                    Name= planName,
                     UserId = userId,
                     WorkoutId = workoutId
                 };
@@ -115,7 +117,7 @@ namespace FitnessProject.Controllers
             }
 
             await _context.SaveChangesAsync();
-
+                
             return RedirectToAction("Index", "UserDetails");
         }
         public async Task<IActionResult> MealPlans(string userId)
@@ -141,16 +143,46 @@ namespace FitnessProject.Controllers
 
             return View(meals);
         }
-
         public async Task<IActionResult> Workouts(string userId)
         {
-            var workouts = await _context.WorkoutPlanUsers
+            var plans = await _context.WorkoutPlanUsers
                 .Where(wp => wp.UserId == userId)
                 .Include(wp => wp.Workout)
+                .GroupBy(wp => wp.Name)
+                .Select(g => new WorkoutPlanViewModel
+                {
+                    PlanName = g.Key,
+                    Workouts = g.Select(x => x.Workout).ToList()
+                })
                 .ToListAsync();
 
-            return View(workouts);
+            ViewBag.UserId = userId; // ✅ important
+            return View(plans);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeletePlan(string planName, string userId)
+        {
+            Console.WriteLine("Plan Nmae:" + planName+ ",User Id: "+ userId);
+            if (string.IsNullOrEmpty(planName) || string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("Invalid data.");
+            }
+
+            var workouts = await _context.WorkoutPlanUsers
+                .Where(wp => wp.UserId == userId && wp.Name == planName)
+                .ToListAsync();
+
+            if (workouts.Any())
+            {
+                _context.WorkoutPlanUsers.RemoveRange(workouts);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Workouts), new { userId });
+        }
+
         [HttpPost]
         public async Task<IActionResult> DeleteMealPlan(int id)
         {
