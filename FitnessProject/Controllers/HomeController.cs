@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using FitnessProject.Data;
 using FitnessProject.Models;
+using FitnessProject.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FitnessProject.Controllers
@@ -7,10 +9,14 @@ namespace FitnessProject.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _context;
+        private readonly BulkAddTag _bulkAddTagService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger,ApplicationDbContext context,BulkAddTag bulkAddTagService)
         {
             _logger = logger;
+            _context = context;
+            _bulkAddTagService = bulkAddTagService;
         }
 
         public IActionResult Index()
@@ -18,8 +24,9 @@ namespace FitnessProject.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        public async Task<IActionResult> PrivacyAsync()
         {
+            //await _bulkAddTagService.AddTagsToUserDetailsAsync();
             return View();
         }
 

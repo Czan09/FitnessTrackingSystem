@@ -1,5 +1,6 @@
 using FitnessProject.Data;
 using FitnessProject.Seeder;
+using FitnessProject.Services;
 using FitnessProject.uitls;
 using FitnessProject.Utils;
 using Microsoft.AspNetCore.Identity;
@@ -17,6 +18,14 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 
 builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddTransient<IEmailService, EmailService>();
+
+builder.Services.AddHttpClient<IAutoTagService, AutoTagService>(client =>
+{
+    client.BaseAddress = new Uri("http://127.0.0.1:8000/");
+});
+
+
+builder.Services.AddScoped<BulkAddTag>();
 
 
 builder.Services.ConfigureApplicationCookie(options =>

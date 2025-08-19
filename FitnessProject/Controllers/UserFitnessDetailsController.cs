@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace FitnessProject.Controllers
 {
@@ -15,17 +16,19 @@ namespace FitnessProject.Controllers
     public class UserFitnessDetailsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IAutoTagService _autoTagService;
 
-        public UserFitnessDetailsController(ApplicationDbContext context)
+        public UserFitnessDetailsController(ApplicationDbContext context, IAutoTagService autoTagService)
         {
             _context = context;
+            _autoTagService = autoTagService;
         }
 
         // GET: UserFitnessDetails
         public async Task<IActionResult> Index()
         {
             var users = await _context.UserFitnessDetails
-                        .Include(u => u.User) 
+                        .Include(u => u.User)
                         .ToListAsync();
             return View(users);
         }
@@ -34,28 +37,21 @@ namespace FitnessProject.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
-
-            var user = await _context.UserFitnessDetails
-                .FirstOrDefaultAsync(m => m.Id == id);
-
+            var user = await _context.UserFitnessDetails.FirstOrDefaultAsync(m => m.Id == id);
             if (user == null) return NotFound();
-
             return View(user);
         }
 
         // GET: UserFitnessDetails/Create
         public async Task<IActionResult> Create()
         {
-           
             var model = new UserFitnessDetailsViewModel
             {
-               
                 GoalOptions = Enum.GetValues(typeof(MemberGoals)).Cast<MemberGoals>()
                     .Select(e => new SelectListItem { Value = e.ToString(), Text = e.ToString() }),
                 ExperienceOptions = Enum.GetValues(typeof(ExperinceLevelMember)).Cast<ExperinceLevelMember>()
                     .Select(e => new SelectListItem { Value = e.ToString(), Text = e.ToString() })
             };
-
             return View(model);
         }
 
@@ -64,39 +60,34 @@ namespace FitnessProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(UserFitnessDetailsViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var user = new UserFitnessDetails
-                {
-                    UserId = model.UserId,
-                    DOB = model.DOB,
-                    Gender = model.Gender,
-                    Height = model.Height,
-                    Weight = model.Weight,
-                    Goal = model.Goal,
-                    ExperienceLevel = model.ExperienceLevel
-                };
-
-
-                //var selectedPlans = await _context.WorkoutPlans
-                //    .Where(p => model.AssignedPlanIds.Contains(p.Id))
-                //    .ToListAsync();
-
-                //user.AssignedPlans = selectedPlans;
-
-                _context.Add(user);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                model.GoalOptions = Enum.GetValues(typeof(MemberGoals)).Cast<MemberGoals>()
+                    .Select(e => new SelectListItem { Value = e.ToString(), Text = e.ToString() });
+                model.ExperienceOptions = Enum.GetValues(typeof(ExperinceLevelMember)).Cast<ExperinceLevelMember>()
+                    .Select(e => new SelectListItem { Value = e.ToString(), Text = e.ToString() });
+                return View(model);
             }
 
-            // Reload dropdowns
-            
-            model.GoalOptions = Enum.GetValues(typeof(MemberGoals)).Cast<MemberGoals>()
-                .Select(e => new SelectListItem { Value = e.ToString(), Text = e.ToString() });
-            model.ExperienceOptions = Enum.GetValues(typeof(ExperinceLevelMember)).Cast<ExperinceLevelMember>()
-                .Select(e => new SelectListItem { Value = e.ToString(), Text = e.ToString() });
+            var user = new UserFitnessDetails
+            {
+                UserId = model.UserId,
+                DOB = model.DOB,
+                Gender = model.Gender,
+                Height = model.Height,
+                Weight = model.Weight,
+                Goal = model.Goal,
+                ExperienceLevel = model.ExperienceLevel
+            };
 
-            return View(model);
+            _context.Add(user);
+            await _context.SaveChangesAsync(); // Save to get user.Id
+
+            // Generate tags for the user
+            var tags = await _autoTagService.GetUserFitnessTags(user.Id);
+            await AddTagsToUser(user.Id, tags);
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: UserFitnessDetails/Edit/5
@@ -104,11 +95,8 @@ namespace FitnessProject.Controllers
         {
             if (id == null) return NotFound();
 
-            var user = await _context.UserFitnessDetails
-                .FirstOrDefaultAsync(u => u.Id == id);
-
+            var user = await _context.UserFitnessDetails.FirstOrDefaultAsync(u => u.Id == id);
             if (user == null) return NotFound();
-
 
             var model = new UserFitnessDetailsViewModel
             {
@@ -120,13 +108,11 @@ namespace FitnessProject.Controllers
                 Weight = user.Weight,
                 Goal = user.Goal,
                 ExperienceLevel = user.ExperienceLevel,
-               
                 GoalOptions = Enum.GetValues(typeof(MemberGoals)).Cast<MemberGoals>()
                     .Select(e => new SelectListItem { Value = e.ToString(), Text = e.ToString() }),
                 ExperienceOptions = Enum.GetValues(typeof(ExperinceLevelMember)).Cast<ExperinceLevelMember>()
                     .Select(e => new SelectListItem { Value = e.ToString(), Text = e.ToString() })
             };
-
             return View(model);
         }
 
@@ -135,79 +121,52 @@ namespace FitnessProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, UserFitnessDetailsViewModel model)
         {
-            Console.WriteLine("Edit Reached Here");
             if (id != model.Id) return NotFound();
-
             if (!ModelState.IsValid)
             {
-               
                 model.GoalOptions = Enum.GetValues(typeof(MemberGoals)).Cast<MemberGoals>()
                     .Select(e => new SelectListItem { Value = e.ToString(), Text = e.ToString() });
                 model.ExperienceOptions = Enum.GetValues(typeof(ExperinceLevelMember)).Cast<ExperinceLevelMember>()
                     .Select(e => new SelectListItem { Value = e.ToString(), Text = e.ToString() });
-
                 return View(model);
             }
 
-            var user = await _context.UserFitnessDetails
-                .FirstOrDefaultAsync(u => u.Id == id);
-
+            var user = await _context.UserFitnessDetails.FirstOrDefaultAsync(u => u.Id == id);
             if (user == null) return NotFound();
 
-            // Update fields
             user.DOB = model.DOB;
             user.Gender = model.Gender;
             user.Height = model.Height;
             user.Weight = model.Weight;
             user.Goal = model.Goal;
             user.ExperienceLevel = model.ExperienceLevel;
-            Console.WriteLine("UserDataEdit:::"+user);
-
-            // Clear and update assigned plans
-            //user.AssignedPlans.Clear();
-            //if (model.AssignedPlanIds != null)
-            //{
-            //    var selectedPlans = await _context.WorkoutPlans
-            //        .Where(p => model.AssignedPlanIds.Contains(p.Id))
-            //        .ToListAsync();
-
-            //    foreach (var plan in selectedPlans)
-            //    {
-            //        user.AssignedPlans.Add(plan);
-            //    }
-            //}
 
             try
             {
                 _context.Update(user);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "User fitness details updated successfully.";
-                return RedirectToAction(nameof(Index));
+
+                // Update tags
+                var tags = await _autoTagService.GetUserFitnessTags(user.Id);
+                await UpdateTagsForUser(user.Id, tags);
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!_context.UserFitnessDetails.Any(e => e.Id == user.Id))
                     return NotFound();
-
-                throw;
+                else throw;
             }
-        }
 
-        private bool UserFitnessDetailsExists(int id)
-        {
-            return _context.UserFitnessDetails.Any(e => e.Id == id);
+            TempData["SuccessMessage"] = "User fitness details updated successfully.";
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: UserFitnessDetails/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
-
-            var user = await _context.UserFitnessDetails
-                .FirstOrDefaultAsync(m => m.Id == id);
-
+            var user = await _context.UserFitnessDetails.FirstOrDefaultAsync(m => m.Id == id);
             if (user == null) return NotFound();
-
             return View(user);
         }
 
@@ -219,10 +178,53 @@ namespace FitnessProject.Controllers
             var user = await _context.UserFitnessDetails.FindAsync(id);
             if (user != null)
             {
+                await RemoveTagsFromUser(user.Id);
                 _context.UserFitnessDetails.Remove(user);
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        // Helper methods for managing user tags
+        private async Task AddTagsToUser(int userId, List<string> tags)
+        {
+            foreach (var tagName in tags)
+            {
+                var tag = await _context.Tags.FirstOrDefaultAsync(t => t.Name == tagName);
+
+                if (tag == null)
+                {
+                    tag = new Tags { Name = tagName };
+                    _context.Tags.Add(tag);
+                    await _context.SaveChangesAsync(); // Save to get tag.Id
+                }
+
+                var exists = await _context.UserTags
+                    .AnyAsync(ut => ut.userDetailId == userId && ut.TagId == tag.Id);
+
+                if (!exists)
+                {
+                    _context.UserTags.Add(new UserTag { userDetailId = userId, TagId = tag.Id });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task UpdateTagsForUser(int userId, List<string> tags)
+        {
+            var oldTags = _context.UserTags.Where(ut => ut.userDetailId == userId);
+            _context.UserTags.RemoveRange(oldTags);
+            await _context.SaveChangesAsync();
+
+            await AddTagsToUser(userId, tags);
+        }
+
+        private async Task RemoveTagsFromUser(int userId)
+        {
+            var userTags = _context.UserTags.Where(ut => ut.userDetailId == userId);
+            _context.UserTags.RemoveRange(userTags);
+            await _context.SaveChangesAsync();
         }
     }
 }

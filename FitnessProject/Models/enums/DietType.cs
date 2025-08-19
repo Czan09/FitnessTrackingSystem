@@ -6,6 +6,6 @@
         NonVeg,
         Vegan,
         Keto,
-        Paleo
+        Paleo   
     }
 }

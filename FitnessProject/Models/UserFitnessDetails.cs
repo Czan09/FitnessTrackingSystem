@@ -39,6 +39,7 @@ namespace FitnessProject.Models
         [NotMapped]
         public float BMI => Weight / (Height / 100 * Height / 100);
 
+        public ICollection<UserTag> userTags { get; set; } = new List<UserTag>();
 
         public virtual ApplicationUser? User { get; set; }
 

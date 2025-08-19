@@ -4,6 +4,7 @@ using FitnessProject.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FitnessProject.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250817032059_sdd")]
+    partial class sdd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -173,6 +176,9 @@ namespace FitnessProject.Migrations
                     b.Property<int>("TagId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
                     b.HasKey("MealId", "TagId");
 
                     b.HasIndex("TagId");
@@ -274,29 +280,6 @@ namespace FitnessProject.Migrations
                     b.ToTable("UserFitnessDetails");
                 });
 
-            modelBuilder.Entity("FitnessProject.Models.UserTag", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("TagId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("userDetailId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TagId");
-
-                    b.HasIndex("userDetailId");
-
-                    b.ToTable("UserTags");
-                });
-
             modelBuilder.Entity("FitnessProject.Models.Workout", b =>
                 {
                     b.Property<int>("Id")
@@ -362,6 +345,9 @@ namespace FitnessProject.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("TagId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
                         .HasColumnType("int");
 
                     b.HasKey("WorkoutId", "TagId");
@@ -556,25 +542,6 @@ namespace FitnessProject.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("FitnessProject.Models.UserTag", b =>
-                {
-                    b.HasOne("FitnessProject.Models.Tags", "Tag")
-                        .WithMany()
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FitnessProject.Models.UserFitnessDetails", "UserFitnessDetails")
-                        .WithMany("userTags")
-                        .HasForeignKey("userDetailId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tag");
-
-                    b.Navigation("UserFitnessDetails");
-                });
-
             modelBuilder.Entity("FitnessProject.Models.WorkoutPlanUser", b =>
                 {
                     b.HasOne("FitnessProject.Data.ApplicationUser", "User")
@@ -667,11 +634,6 @@ namespace FitnessProject.Migrations
             modelBuilder.Entity("FitnessProject.Models.Diets", b =>
                 {
                     b.Navigation("MealTags");
-                });
-
-            modelBuilder.Entity("FitnessProject.Models.UserFitnessDetails", b =>
-                {
-                    b.Navigation("userTags");
                 });
 
             modelBuilder.Entity("FitnessProject.Models.Workout", b =>

@@ -22,5 +22,8 @@ namespace FitnessProject.Models
         [Required]
         [Range(1, 5, ErrorMessage = "Difficulty Should be 1 to 5")]
         public int DifficultyLevel { get; set; }
+
+        public ICollection<WorkoutTags> WorkoutTags { get; set; }
+
     }
 }

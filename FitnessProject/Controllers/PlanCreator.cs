@@ -1,33 +1,53 @@
 ﻿using FitnessProject.Data;
 using FitnessProject.Models;
 using FitnessProject.Models.enums;
-using FitnessProject.RecommendationEngine;
 using FitnessProject.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace FitnessProject.Controllers
 {
     public class PlanCreator : Controller
     {
-        private readonly Engine _engine;
         private readonly ApplicationDbContext _context;
 
         public PlanCreator(ApplicationDbContext context)
         {
-            _engine = new Engine();
             _context = context;
+        }
+
+        // Helper method to call Python microservice
+        private async Task<dynamic> GetPythonRecommendationsAsync(int userId)
+        {
+            string pythonEndpoint = $"http://127.0.0.1:8000/autoTag/recommendation/{userId}";
+            using var client = new HttpClient();
+            var response = await client.GetAsync(pythonEndpoint);
+            if (!response.IsSuccessStatusCode) return null;
+
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<dynamic>(content);
         }
 
         public async Task<IActionResult> FoodPlanGenerate(string userId)
         {
-            var userDetails =  await _context.UserFitnessDetails.FirstOrDefaultAsync(u => u.UserId == userId);
-            if(userDetails == null){
-                return NotFound("User not found");
-            }
-            var allMeals =  await _context.Diets.ToListAsync();
-            var recommendedMeals = _engine.RecommendMeals(userDetails, allMeals);
+            var userDetails = await _context.UserFitnessDetails.FirstOrDefaultAsync(u => u.UserId == userId);
+            if (userDetails == null) return NotFound("User not found");
+
+            var result = await GetPythonRecommendationsAsync(userDetails.Id);
+            if (result == null) return BadRequest("Failed to get recommendations");
+
+            List<int> recommendedMealIds = new List<int>();
+            foreach (var meal in result.data.recommended_meals)
+                recommendedMealIds.Add((int)meal.MealId);
+
+            var recommendedMeals = await _context.Diets
+                .Where(d => recommendedMealIds.Contains(d.Id))
+                .ToListAsync();
 
             var vm = new PlanResultViewModel
             {
@@ -41,15 +61,17 @@ namespace FitnessProject.Controllers
         public async Task<IActionResult> WorkoutPlanGenerate(string userId)
         {
             var userDetails = await _context.UserFitnessDetails.FirstOrDefaultAsync(u => u.UserId == userId);
-            if (userDetails == null)
-                return NotFound("User not found");
+            if (userDetails == null) return NotFound("User not found");
 
-            // Get recommended workout types from Engine
-            var recommendedTypes = _engine.RecommendWorkouts(userDetails.ExperienceLevel, userDetails.Goal);
+            var result = await GetPythonRecommendationsAsync(userDetails.Id);
+            if (result == null) return BadRequest("Failed to get recommendations");
 
-            // Query workouts from DB matching those types
+            List<int> recommendedWorkoutIds = new List<int>();
+            foreach (var workout in result.data.recommended_workouts)
+                recommendedWorkoutIds.Add((int)workout.WorkoutId);
+
             var recommendedWorkouts = await _context.Workouts
-                .Where(w => recommendedTypes.Contains(w.Type))
+                .Where(w => recommendedWorkoutIds.Contains(w.Id))
                 .ToListAsync();
 
             var vm = new PlanResultViewModel
@@ -65,13 +87,8 @@ namespace FitnessProject.Controllers
         public async Task<IActionResult> SaveFoodPlan(string userId, string planName, List<int> selectedMealIds)
         {
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(planName) || selectedMealIds == null || selectedMealIds.Count == 0)
-            {
-                Console.WriteLine(userId);
-                Console.WriteLine(planName);
                 return BadRequest("Invalid input data.");
-            }
 
-            // Create MealPlan
             var mealPlan = new MealPlan
             {
                 Name = planName,
@@ -79,9 +96,8 @@ namespace FitnessProject.Controllers
             };
 
             _context.MealPlans.Add(mealPlan);
-            await _context.SaveChangesAsync(); // save to get mealPlan.Id
+            await _context.SaveChangesAsync();
 
-            // Create MealPlanMeals
             foreach (var mealId in selectedMealIds)
             {
                 _context.MealPlanMeals.Add(new MealPlanMeals
@@ -93,33 +109,28 @@ namespace FitnessProject.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction("Index", "UserDetails");
-
         }
+
         [HttpPost]
         public async Task<IActionResult> SaveWorkoutPlan(string userId, string planName, List<int> selectedWorkoutIds)
         {
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(planName) || selectedWorkoutIds == null || selectedWorkoutIds.Count == 0)
-            {
                 return BadRequest("Invalid input data.");
-            }
 
-            // Create and save each workout for the user
             foreach (var workoutId in selectedWorkoutIds)
             {
-                var entry = new WorkoutPlanUser
+                _context.WorkoutPlanUsers.Add(new WorkoutPlanUser
                 {
-                    Name= planName,
+                    Name = planName,
                     UserId = userId,
                     WorkoutId = workoutId
-                };
-
-                _context.WorkoutPlanUsers.Add(entry);
+                });
             }
 
             await _context.SaveChangesAsync();
-                
             return RedirectToAction("Index", "UserDetails");
         }
+
         public async Task<IActionResult> MealPlans(string userId)
         {
             var plans = await _context.MealPlans
@@ -129,6 +140,7 @@ namespace FitnessProject.Controllers
 
             return View(plans);
         }
+
         public async Task<IActionResult> MealPlanDetails(int id)
         {
             var meals = await _context.MealPlanMeals
@@ -143,6 +155,7 @@ namespace FitnessProject.Controllers
 
             return View(meals);
         }
+
         public async Task<IActionResult> Workouts(string userId)
         {
             var plans = await _context.WorkoutPlanUsers
@@ -156,7 +169,7 @@ namespace FitnessProject.Controllers
                 })
                 .ToListAsync();
 
-            ViewBag.UserId = userId; // ✅ important
+            ViewBag.UserId = userId;
             return View(plans);
         }
 
@@ -164,11 +177,8 @@ namespace FitnessProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePlan(string planName, string userId)
         {
-            Console.WriteLine("Plan Nmae:" + planName+ ",User Id: "+ userId);
             if (string.IsNullOrEmpty(planName) || string.IsNullOrEmpty(userId))
-            {
                 return BadRequest("Invalid data.");
-            }
 
             var workouts = await _context.WorkoutPlanUsers
                 .Where(wp => wp.UserId == userId && wp.Name == planName)
@@ -187,10 +197,8 @@ namespace FitnessProject.Controllers
         public async Task<IActionResult> DeleteMealPlan(int id)
         {
             var plan = await _context.MealPlans.FindAsync(id);
-            if (plan == null)
-                return NotFound();
+            if (plan == null) return NotFound();
 
-            // Also delete associated meals
             var planMeals = await _context.MealPlanMeals
                 .Where(mp => mp.mealPlanId == id)
                 .ToListAsync();
@@ -199,10 +207,7 @@ namespace FitnessProject.Controllers
             _context.MealPlans.Remove(plan);
 
             await _context.SaveChangesAsync();
-
             return RedirectToAction("MealPlans", new { userId = plan.userId });
         }
-
     }
 }
-

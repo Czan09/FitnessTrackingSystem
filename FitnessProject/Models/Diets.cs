@@ -17,6 +17,6 @@ namespace FitnessProject.Models
 
         public DietType Type { get; set; }
 
-
+        public ICollection<MealTags> MealTags { get; set; }
     }
 }
