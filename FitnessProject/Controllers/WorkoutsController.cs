@@ -148,17 +148,35 @@ namespace FitnessProject.Controllers
         {
             foreach (var tagName in tags)
             {
-                var tag = await _context.Tags.FirstOrDefaultAsync(t => t.Name == tagName)
-                          ?? new Tags { Name = tagName };
+                // Try to find the tag
+                var tag = await _context.Tags.FirstOrDefaultAsync(t => t.Name == tagName);
 
-                if (!_context.Tags.Any(t => t.Name == tagName))
+                // If not found, create and save it so it gets an Id
+                if (tag == null)
+                {
+                    tag = new Tags { Name = tagName };
                     _context.Tags.Add(tag);
+                    await _context.SaveChangesAsync();
+                }
 
-                if (!_context.WorkoutTags.Any(wt => wt.WorkoutId == workoutId && wt.TagId == tag.Id))
-                    _context.WorkoutTags.Add(new WorkoutTags { WorkoutId = workoutId, TagId = tag.Id });
+                // Check if relationship already exists
+                bool exists = await _context.WorkoutTags
+                    .AnyAsync(wt => wt.WorkoutId == workoutId && wt.TagId == tag.Id);
+
+                if (!exists)
+                {
+                    _context.WorkoutTags.Add(new WorkoutTags
+                    {
+                        WorkoutId = workoutId,
+                        TagId = tag.Id
+                    });
+                }
             }
+
+            // Save all new WorkoutTags in one go
             await _context.SaveChangesAsync();
         }
+
 
         private async Task UpdateTagsForWorkout(int workoutId, List<string> tags)
         {

@@ -65,12 +65,11 @@ namespace FitnessProject.Controllers
             }
 
             _context.Add(diet);
+
             await _context.SaveChangesAsync();
             
-            // Call Python service to generate tags
             var tags = await _autoTagService.GetMealTagsAsync(diet.Id);
 
-            // Optional: Save tags in your DB if you store them
             await AddTagsToDiet(diet.Id, tags);
 
             return RedirectToAction(nameof(Index));
@@ -153,17 +152,31 @@ namespace FitnessProject.Controllers
         {
             foreach (var tagName in tags)
             {
-                var tag = await _context.Tags.FirstOrDefaultAsync(t => t.Name == tagName)
-                          ?? new Tags { Name = tagName };
-
-                if (!_context.Tags.Any(t => t.Name == tagName))
+                var tag = await _context.Tags.FirstOrDefaultAsync(t => t.Name == tagName);
+                if (tag == null)
+                {
+                    tag = new Tags { Name = tagName };
                     _context.Tags.Add(tag);
 
-                if (!_context.MealTags.Any(mt => mt.MealId == dietId && mt.TagId == tag.Id))
-                    _context.MealTags.Add(new MealTags { MealId = dietId, TagId = tag.Id });
+                    await _context.SaveChangesAsync();
+                }
+
+                var exists = await _context.MealTags
+                    .AnyAsync(mt => mt.MealId == dietId && mt.TagId == tag.Id);
+
+                if (!exists)
+                {
+                    _context.MealTags.Add(new MealTags
+                    {
+                        MealId = dietId,
+                        TagId = tag.Id
+                    });
+                }
             }
+
             await _context.SaveChangesAsync();
         }
+
 
         private async Task UpdateTagsForDiet(int dietId, List<string> tags)
         {

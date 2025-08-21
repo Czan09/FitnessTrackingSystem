@@ -24,7 +24,6 @@ namespace FitnessProject.Controllers
             _autoTagService = autoTagService;
         }
 
-        // GET: UserFitnessDetails
         public async Task<IActionResult> Index()
         {
             var users = await _context.UserFitnessDetails
@@ -33,7 +32,6 @@ namespace FitnessProject.Controllers
             return View(users);
         }
 
-        // GET: UserFitnessDetails/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -42,7 +40,6 @@ namespace FitnessProject.Controllers
             return View(user);
         }
 
-        // GET: UserFitnessDetails/Create
         public async Task<IActionResult> Create()
         {
             var model = new UserFitnessDetailsViewModel
@@ -55,7 +52,6 @@ namespace FitnessProject.Controllers
             return View(model);
         }
 
-        // POST: UserFitnessDetails/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(UserFitnessDetailsViewModel model)
@@ -81,9 +77,8 @@ namespace FitnessProject.Controllers
             };
 
             _context.Add(user);
-            await _context.SaveChangesAsync(); // Save to get user.Id
+            await _context.SaveChangesAsync(); 
 
-            // Generate tags for the user
             var tags = await _autoTagService.GetUserFitnessTags(user.Id);
             await AddTagsToUser(user.Id, tags);
 
