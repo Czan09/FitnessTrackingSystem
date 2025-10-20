@@ -1,0 +1,37 @@
+﻿@model FitnessProject.Models.WorkoutPlanTrainer
+
+@{
+    ViewData["Title"] = "Workout Plan Details";
+}
+
+<h2>Workout Plan Details</h2>
+<hr />
+
+<dl class="row">
+    <dt class="col-sm-2">Plan Name</dt>
+    <dd class="col-sm-10">@Model.PlanName</dd>
+
+    <dt class="col-sm-2">Trainer</dt>
+    <dd class="col-sm-10">@Model.Trainer?.Name</dd>
+
+    <dt class="col-sm-2">Workouts</dt>
+    <dd class="col-sm-10">
+        @if (Model.WorkoutPlanTrainerWorkouts != null && Model.WorkoutPlanTrainerWorkouts.Any())
+        {
+            <ul>
+                @foreach (var w in Model.WorkoutPlanTrainerWorkouts)
+                {
+                    <li>@w.Workout?.Name</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <span>No workouts assigned</span>
+        }
+    </dd>
+</dl>
+
+<p>
+    <a asp-action="Index" class="btn btn-secondary">Back to My Plans</a>
+</p>

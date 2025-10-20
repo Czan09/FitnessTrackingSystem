@@ -1,0 +1,68 @@
+﻿@model FitnessProject.Models.WorkoutPlanTrainer
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Edit Workout Plan";
+}
+
+<h2>Edit Workout Plan</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="PlanName" class="control-label"></label>
+        <input asp-for="PlanName" class="form-control" />
+        <span asp-validation-for="PlanName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="UserId" class="control-label">Assign to User</label>
+        <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
+        <span asp-validation-for="UserId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Select Workouts</label>
+        <input type="text" id="workoutSearch" class="form-control mb-2" placeholder="Search workouts..." />
+
+        <div id="workoutList" style="max-height: 250px; overflow-y: auto; border: 1px solid #ccc; padding: 5px;">
+            @if (ViewBag.Workouts != null)
+            {
+                foreach (var workout in ViewBag.Workouts as MultiSelectList)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input workout-checkbox" type="checkbox"
+                               name="WorkoutIds" value="@workout.Value"
+                               id="workout_@workout.Value"
+                        @(Model.WorkoutIds.Contains(int.Parse(workout.Value)) ? "checked" : "") />
+                        <label class="form-check-label" for="workout_@workout.Value">@workout.Text</label>
+                    </div>
+                }
+            }
+            else
+            {
+                <span>No workouts available</span>
+            }
+        </div>
+        <span asp-validation-for="WorkoutIds" class="text-danger"></span>
+    </div>
+
+    <!-- TrainerId is server-set, not from client -->
+    <input type="hidden" name="TrainerIdViewOnly" value="@Model.TrainerId" />
+
+    <button type="submit" class="btn btn-success">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</form>
+
+@section Scripts {
+    <script>
+        document.getElementById('workoutSearch').addEventListener('keyup', function () {
+            var filter = this.value.toLowerCase();
+            document.querySelectorAll('#workoutList .form-check').forEach(function (item) {
+                var label = item.querySelector('label').innerText.toLowerCase();
+                item.style.display = label.includes(filter) ? 'block' : 'none';
+            });
+        });
+    </script>
+}

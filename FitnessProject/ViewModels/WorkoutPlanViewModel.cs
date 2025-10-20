@@ -1,4 +1,4 @@
-﻿using FitnessProject.Models;
+﻿ using FitnessProject.Models;
 
 namespace FitnessProject.ViewModels
 {

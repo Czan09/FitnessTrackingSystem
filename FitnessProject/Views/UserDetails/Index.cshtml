@@ -7,51 +7,158 @@
     var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 }
 
-<div class="container mt-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h2 class="mb-0">Welcome, @userName</h2>
-        </div>
-        <div class="card-body">
-            <p><strong>Your Role:</strong> @userRole</p>
+<style>
+    body {
+        display: flex; 
+        justify-content: center; 
+        flex-direction:column;
+    }
 
-            <div class="mt-4">
-                
-                <a href="@Url.Action("ChangePassword", "UserDetails")" class="btn btn-danger mb-2">
-                    Change Password
-                </a>
-                <br/>
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-                @if (userRole == "Member")
-                {
-                    <a href="@Url.Action("EditProfile", "UserDetails")" class="btn btn-warning mb-2">
-                        Edit Profile
-                    </a>
-                    
-                    <br />
-                    <a href="@Url.Action("WorkoutPlanGenerate", "PlanCreator", new { userId = userId })" class="btn btn-success mb-2">
-                        Generate Workout Plan
-                    </a>
-                    <br />
-                    <a href="@Url.Action("FoodPlanGenerate", "PlanCreator", new { userId = userId })" class="btn btn-success mb-2">
-                        Generate Food Plan
-                    </a>
-                    <br />
-                    <a class="btn btn-success mb-2"
-                       asp-controller="PlanCreator"
-                       asp-action="MealPlans"
-                       asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">
-                        My Meal Plans
-                    </a>
-                    <br />
-                    <a class="btn btn-success mb-2"
-                       asp-controller="PlanCreator"
-                       asp-action="Workouts"
-                       asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">
-                        My Saved Workouts
-                    </a>
+    .card {
+        position: relative;
+        width: 515px;
+        height: 345px;
+        overflow: hidden;
+        border-radius: 10px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        padding:20px;
+    }
+
+        .card .icon {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #2c73df;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+            .card .icon .fa {
+                font-size: 80px;
+                color: #fff;
+            }
+
+        .card .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: transform 0.6s ease;
+        }
+
+            .card .slide.slide1 {
+                background: #2c73df;
+                color: #fff;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                transform: translateY(0);
+                z-index: 2;
+            }
+
+                .card .slide.slide1 h3,
+                .card .slide.slide1 p {
+                    margin: 5px 0;
+                    text-align: center;
                 }
-            </div>
+
+            .card .slide.slide2 {
+                background: #fff;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+                transform: translateY(100%);
+                z-index: 3;
+            }
+
+        .card:hover .slide.slide1 {
+            transform: translateY(-100%);
+        }
+
+        .card:hover .slide.slide2 {
+            transform: translateY(0);
+        }
+
+    .btn {
+        display: inline-block;
+        margin: 8px 0;
+        padding: 8px 14px;
+        font-size: 14px;
+        text-decoration: none;
+        border-radius: 4px;
+        color: #fff;
+        text-align: center;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+    }
+
+    .btn-warning {
+        background: #ffc107;
+        color: #000;
+    }
+
+    .btn-success {
+        background: #28a745;
+    }
+</style>
+
+<div class="container">
+    <div class="card">
+        <!-- Slide 1 -->
+        <div class="slide slide1">
+            <h3>Welcome, @userName</h3>
+            <p><strong>Role:</strong> @userRole</p>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="slide slide2">
+            <a href="@Url.Action("ChangePassword", "UserDetails")" class="btn btn-danger">Change Password</a><br />
+
+            @if (userRole == "Member")
+            {
+                <a href="@Url.Action("EditProfile", "UserDetails")" class="btn btn-warning">Edit Profile</a>
+
+                <br />
+
+                <a href="@Url.Action("WorkoutPlanGenerate", "PlanCreator", new { userId = userId })" class="btn btn-success">Generate Workout Plan</a>
+
+                <br />
+
+                <a href="@Url.Action("FoodPlanGenerate", "PlanCreator", new { userId = userId })" class="btn btn-success">Generate Food Plan</a>
+
+                <br />
+
+                <a class="btn btn-success"
+                   asp-controller="PlanCreator"
+                   asp-action="MealPlans"
+                   asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">
+                    My Meal Plans
+                </a>
+
+                <br />
+
+                <a class="btn btn-success"
+                   asp-controller="PlanCreator"
+                   asp-action="Workouts"
+                   asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">
+                    My Saved Workouts
+                </a>
+            }
         </div>
     </div>
 </div>

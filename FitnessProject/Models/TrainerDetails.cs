@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using FitnessProject.Data;
 
 namespace FitnessProject.Models
 {
@@ -16,6 +17,7 @@ namespace FitnessProject.Models
         [EmailAddress(ErrorMessage = "Please enter a valid email address")]
         public string Contact { get; set; } = string.Empty;
 
-      
+        public string? ApplicationUserId { get; set; }
+        public ApplicationUser? ApplicationUser { get; set; }
     }
 }

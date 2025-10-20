@@ -1,0 +1,53 @@
+﻿@model IEnumerable<FitnessProject.Models.MealPlanTrainer>
+
+@{
+    ViewData["Title"] = "My Meal Plans";
+}
+
+<h2>My Meal Plans</h2>
+<hr />
+
+@if (!Model.Any())
+{
+    <p>No meal plans assigned to you yet.</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Plan Name</th>
+                <th>Trainer</th>
+                <th>Meals</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var plan in Model)
+            {
+                <tr>
+                    <td>@plan.PlanName</td>
+                    <td>@plan.Trainer?.Name</td>
+                    <td>
+                        @if (plan.Meals != null && plan.Meals.Any())
+                        {
+                            <ul>
+                                @foreach (var meal in plan.Meals)
+                                {
+                                    <li>@meal.MealName</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <span>No meals assigned</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@plan.Id" class="btn btn-info btn-sm">View Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

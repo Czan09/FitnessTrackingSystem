@@ -1,0 +1,61 @@
+﻿@model FitnessProject.Models.MealPlanTrainer
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Edit Meal Plan";
+}
+
+<h2>Edit Meal Plan</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="PlanName" class="control-label"></label>
+        <input asp-for="PlanName" class="form-control" />
+        <span asp-validation-for="PlanName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="UserId" class="control-label">Assign to User</label>
+        <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
+        <span asp-validation-for="UserId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Select Meals</label>
+        <input type="text" id="mealSearch" class="form-control mb-2" placeholder="Search meals..." />
+
+        <div id="mealList" style="max-height: 250px; overflow-y: auto; border: 1px solid #ccc; padding: 5px;">
+            @if (ViewBag.Meals != null)
+            {
+                foreach (var meal in ViewBag.Meals as MultiSelectList)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input meal-checkbox" type="checkbox"
+                               name="selectedMeals" value="@meal.Value"
+                               id="meal_@meal.Value"
+                        @(Model?.MealPlanTrainerMeals != null && Model.MealPlanTrainerMeals.Any(m => m.MealId.ToString() == meal.Value) ? "checked" : "") />
+                        <label class="form-check-label" for="meal_@meal.Value">@meal.Text</label>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</form>
+
+@section Scripts {
+    <script>
+        document.getElementById('mealSearch').addEventListener('keyup', function () {
+            var filter = this.value.toLowerCase();
+            var items = document.querySelectorAll('#mealList .form-check');
+            items.forEach(function (item) {
+                var label = item.querySelector('label').innerText.toLowerCase();
+                item.style.display = label.includes(filter) ? 'block' : 'none';
+            });
+        });
+    </script>
+}

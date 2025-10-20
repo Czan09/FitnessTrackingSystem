@@ -34,9 +34,9 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">FitnessProject</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SweatSync</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
@@ -52,13 +52,34 @@
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-controller="UserFitnessDetails" asp-action="Index">User Fitness</a>
                                 </li>
-                              
+
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-controller="Workouts" asp-action="Index">Workouts</a>
                                 </li>
-                               
-                            }
 
+                            }
+                            if (User.IsInRole("Trainer"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link  text-dark" asp-area="" asp-controller="WorkoutPlanTrainer" asp-action="Index">
+                                        Workout Plans
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="MealPlanTrainer" asp-action="Index">Meal Plans</a>
+                                </li>
+                            }
+                            if (User.IsInRole("Member"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="UserWorkoutPlan" asp-action="Index">My Workout Plans</a>
+
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="MealPlanUser" asp-action="MyPlans">My Meal Plans</a>
+
+                                </li>
+                            }
                             // Trainer Details only for Admin
                             if (User.IsInRole("Admin"))
                             {

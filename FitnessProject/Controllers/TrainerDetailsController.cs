@@ -43,6 +43,7 @@ namespace FitnessProject.Controllers
         }
 
         // GET: TrainerDetails/Create
+        // GET: TrainerDetails/Create
         public IActionResult Create()
         {
             return View();
@@ -61,6 +62,7 @@ namespace FitnessProject.Controllers
                 return View(model);
             }
 
+            // Create the ApplicationUser
             var user = new ApplicationUser
             {
                 UserName = model.Contact,
@@ -70,7 +72,6 @@ namespace FitnessProject.Controllers
             };
 
             string defaultPassword = "Password@123";
-
             Console.WriteLine($"Attempting to create user with username/email: {model.Contact}");
 
             var result = await _userManager.CreateAsync(user, defaultPassword);
@@ -88,9 +89,12 @@ namespace FitnessProject.Controllers
 
             Console.WriteLine("User created successfully");
 
-            // Assign role (Trainer)
+            // Assign Trainer role
             await _userManager.AddToRoleAsync(user, "Trainer");
             Console.WriteLine("Assigned Trainer role to user");
+
+            // Link TrainerDetails to the newly created user
+            model.ApplicationUserId = user.Id;
 
             // Save TrainerDetails
             _context.TrainerDetails.Add(model);

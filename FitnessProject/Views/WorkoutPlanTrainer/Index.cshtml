@@ -1,0 +1,53 @@
+﻿@model IEnumerable<FitnessProject.Models.WorkoutPlanTrainer>
+
+@{
+    ViewData["Title"] = "Workout Plans";
+}
+
+<h2>Workout Plans</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Plan</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Plan Name</th>
+            <th>User</th>
+            <th>Trainer</th>
+            <th>Workouts</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.PlanName</td>
+                <td>@item.User?.UserName</td>
+                <td>@item.Trainer?.Name</td>
+                <td>
+                    @if (item.WorkoutPlanTrainerWorkouts != null && item.WorkoutPlanTrainerWorkouts.Any())
+                    {
+                        <ul>
+                            @foreach (var wptw in item.WorkoutPlanTrainerWorkouts)
+                            {
+                                <li>@wptw.Workout?.Name</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span>No Workouts</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

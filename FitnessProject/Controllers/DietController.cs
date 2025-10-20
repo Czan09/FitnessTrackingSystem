@@ -46,6 +46,17 @@ namespace FitnessProject.Controllers
             return View(items);
         }
 
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var diet = await _context.Diets.FirstOrDefaultAsync(m => m.Id == id);
+
+            if (diet == null) return NotFound();
+
+            return View(diet);
+        }
+
         // GET: Diet/Create
         public IActionResult Create()
         {

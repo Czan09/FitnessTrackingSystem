@@ -1,0 +1,52 @@
+﻿@model IEnumerable<FitnessProject.Models.WorkoutPlanTrainer>
+
+@{
+    ViewData["Title"] = "My Workout Plans";
+}
+
+<h2>My Workout Plans</h2>
+
+@if (!Model.Any())
+{
+    <p>You have no assigned workout plans.</p>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Plan Name</th>
+                <th>Trainer</th>
+                <th>Workouts</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var plan in Model)
+            {
+                <tr>
+                    <td>@plan.PlanName</td>
+                    <td>@plan.Trainer?.Name</td>
+                    <td>
+                        @if (plan.WorkoutPlanTrainerWorkouts != null && plan.WorkoutPlanTrainerWorkouts.Any())
+                        {
+                            <ul>
+                                @foreach (var w in plan.WorkoutPlanTrainerWorkouts)
+                                {
+                                    <li>@w.Workout?.Name</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <span>No workouts assigned</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@plan.Id" class="btn btn-info btn-sm">View</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -2,7 +2,142 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%; /* ✅ fixed missing semicolon */
+        font-family: Arial, sans-serif;
+        overflow: hidden;
+        background-size: contain;
+    }
+
+    .home-container {
+        position: relative;
+        height: 100vh;
+        width: 100%;
+        background: url('@Url.Content("~/Gallery/CustomImages/ecf495ab-fce6-4e64-b5de-c4e3cde68f74.png")') no-repeat center top; /* 👈 focus top */
+        background-size: cover;
+        background-position: center 20%; /* 👈 move image down a bit */
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 60px;
+        object-fit: cover;
+    }
+
+    .home-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 1;
+    }
+
+    .home-content {
+        position: relative;
+        z-index: 2;
+        text-align: right;
+        max-width: 600px;
+        padding: 20px;
+    }
+
+        /* ✅ Gradient Text */
+        .home-content h1,
+        .home-content p {
+            background: linear-gradient(to right, white, gray, silver);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            transition: background-position 0.6s ease-in-out;
+            display: inline-block;
+            object-fit: contain;
+        }
+
+        .home-content h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .home-content p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+            .home-content h1:hover,
+            .home-content p:hover {
+                background-position: right center; /* hover animation */
+            }
+
+    /* Explosive Hover Button */
+    .explosive-btn {
+        font-size: 1.3rem;
+        color: #fff;
+        background: linear-gradient(to right, #000, #222);
+        border: none;
+        padding: 14px 36px;
+        border-radius: 8px;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.3s ease-out;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+        .explosive-btn:hover {
+            transform: scale(1.1);
+        }
+
+            .explosive-btn:hover::before,
+            .explosive-btn:hover::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 200%;
+                height: 200%;
+                border-radius: 50%;
+                transform: translate(-50%, -50%) scale(0);
+                animation: burst 1s ease-out forwards;
+            }
+
+            .explosive-btn:hover::before {
+                background: radial-gradient(circle, white, transparent);
+                z-index: -1;
+            }
+
+            .explosive-btn:hover::after {
+                background: radial-gradient(circle, rgba(245, 245, 255, 0.6) , transparent);
+                z-index: -2;
+            }
+
+    @@keyframes burst {
+        0% {
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 1;
+        }
+
+        70% {
+            opacity: 0.8;
+        }
+
+        100% {
+            transform: translate(-50%, -50%) scale(1.5);
+            opacity: 0;
+        }
+    }
+</style>
+
+<div class="home-container">
+    <div class="home-overlay"></div>
+    <div class="home-content">
+        <h1 class="display-4">Welcome to SweatSync</h1>
+        <p>Your journey towards a healthier, stronger, and happier life starts here.</p>
+        <a asp-controller="Account" asp-action="Register" class="explosive-btn">Get Started</a>
+    </div>
 </div>

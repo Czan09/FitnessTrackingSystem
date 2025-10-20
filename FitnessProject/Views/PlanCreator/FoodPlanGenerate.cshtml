@@ -3,10 +3,10 @@
 <h2>Recommended Meals</h2>
 
 
-@if (Model.RecommendedMeals?.Any() == true)
-{
+@* @if (Model.RecommendedMeals?.Any() == true) *@
+@* { *@
     <form method="post" asp-action="SaveFoodPlan">
-        <input type="hidden" name="UserId" asp-for="@Model.UserId" readonly/>
+        <input type="hidden" name="UserId" value="@Model.UserId" />
         <input type="text" name="PlanName" placeholder="Enter plan name" class="form-control mb-2" required />
 
         <table class="table table-bordered">
@@ -37,8 +37,9 @@
 
         <button type="submit" class="btn btn-success">Save Plan</button>
     </form>
-}
-else
-{
-    <p>No recommended meals found.</p>
-}
+
+@* } *@
+@* else *@
+@* { *@
+@*     <p>No recommended meals found.</p> *@
+@* } *@
